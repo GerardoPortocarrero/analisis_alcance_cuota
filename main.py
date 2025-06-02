@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import non_alcoholic as nonal
+import alcoholic as al
+import join_images as ji
 
 def read_excel_file(local_file_address, file_sheet_name):
     # Leer datos del archivo de correo
@@ -34,225 +37,6 @@ def filter_by_month(df, month, year):
     fecha_fin = pd.to_datetime('01/'+str(int(month)+1)+'/'+str(year), format='%d/%m/%Y')
     return df[(df['FECHA'] >= fecha_inicio) & (df['FECHA'] < fecha_fin)]
 
-def draw_by_non_alcoholic_drink_for_actual_month(df, date, bar_width, bar_height, color, font_size):
-    try:        
-        # Filtrar solo las filas con CONCEPTO = 'BEBIDA'
-        concepto = 'BEBIDA'
-        df = df[df['CONCEPTO'] == concepto]
-
-        # Agrupar y ordenar
-        cf_bebida = df.groupby('SEDE')['CF'].sum().sort_values(ascending=False)
-
-        # Crear figura y eje
-        fig, ax = plt.subplots()
-
-        # Graficar
-        cf_bebida.plot(
-            kind='bar',
-            title=f'{concepto}S NO ALCOHOLICAS',
-            ax=ax,
-            figsize=(bar_width, bar_height),
-            color=color
-        )
-
-        total_cf_bebida = 0
-        # Agregar valores exactos encima de cada barra
-        for i, value in enumerate(cf_bebida.values):
-            total_cf_bebida = total_cf_bebida + value
-            ax.text(
-                i, value + (value * 0.01),       # posición Y: ligeramente arriba de la barra
-                f'{value:,.1f} CF',               # formato: separador de miles, sin decimales
-                ha='center', va='bottom',
-                fontsize=font_size, color='black'
-            )
-
-        # Agregar nota dentro del gráfico (opcional)
-        ax.text(
-            0.98, 0.96,
-            ('MES: ' + str(date) + '\n\nTotal: ' + str(f'{total_cf_bebida:,.1f} CF')), # texto a mostrar
-            transform=ax.transAxes,
-            ha='right', va='top',
-            fontsize=font_size-2,
-            color='gray',
-            bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.3')
-        )
-
-        # Cambiar el titulo del eje x
-        ax.set_xlabel("")
-
-        # Rotar etiquetas del eje X
-        plt.xticks(rotation=45, ha='right', fontsize=font_size)
-
-        plt.tight_layout()
-        plt.savefig(f'{concepto}S NO ALCOHOLICAS-{date}.png')
-    except:
-        print(f'Cantidad de datos: {len(df)}')
-        print('No hay datos (Probablemente un domingo o festivo o no hubo rechazos)')
-
-def draw_by_alcoholic_drink_for_actual_month(df, date, bar_width, bar_height, color, font_size):
-    try:        
-        # Filtrar solo las filas con CONCEPTO = 'BEBIDA'
-        concepto = 'BEBIDAS ALCOHOLICAS'
-        df = df[df['CONCEPTO'] == concepto]
-
-        # Agrupar y ordenar
-        cf_bebida = df.groupby('SEDE')['CF'].sum().sort_values(ascending=False)
-
-        # Crear figura y eje
-        fig, ax = plt.subplots()
-
-        # Graficar
-        cf_bebida.plot(
-            kind='bar',
-            title=f'{concepto}',
-            ax=ax,
-            figsize=(bar_width, bar_height),
-            color=color
-        )
-
-        total_cf_bebida = 0
-        # Agregar valores exactos encima de cada barra
-        for i, value in enumerate(cf_bebida.values):
-            total_cf_bebida = total_cf_bebida + value
-            ax.text(
-                i, value + (value * 0.01),       # posición Y: ligeramente arriba de la barra
-                f'{value:,.1f} CF',               # formato: separador de miles, sin decimales
-                ha='center', va='bottom',
-                fontsize=font_size, color='black'
-            )
-
-        # Agregar nota dentro del gráfico (opcional)
-        ax.text(
-            0.98, 0.96,
-            ('MES: ' + str(date) + '\n\nTotal: ' + str(f'{total_cf_bebida:,.1f} CF')), # texto a mostrar
-            transform=ax.transAxes,
-            ha='right', va='top',
-            fontsize=font_size-2,
-            color='gray',
-            bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.3')
-        )
-
-        # Cambiar el titulo del eje x
-        ax.set_xlabel("")
-
-        # Rotar etiquetas del eje X
-        plt.xticks(rotation=45, ha='right', fontsize=font_size)
-
-        plt.tight_layout()
-        plt.savefig(f'{concepto}-{date}.png')
-    except:
-        print(f'Cantidad de datos: {len(df)}')
-        print('No hay datos (Probablemente un domingo o festivo o no hubo rechazos)')
-
-def draw_by_non_alcoholic_drink_for_year(df, date, bar_width, bar_height, color, font_size):
-    try:        
-        # Filtrar solo las filas con CONCEPTO = 'BEBIDA'
-        concepto = 'BEBIDA'
-        df = df[df['CONCEPTO'] == concepto]
-
-        # Agrupar y ordenar
-        cf_bebida = df.groupby('SEDE')['CF'].sum().sort_values(ascending=False)
-
-        # Crear figura y eje
-        fig, ax = plt.subplots()
-
-        # Graficar
-        cf_bebida.plot(
-            kind='bar',
-            title=f'{concepto}S NO ALCOHOLICAS',
-            ax=ax,
-            figsize=(bar_width, bar_height),
-            color=color
-        )
-
-        total_cf_bebida = 0
-        # Agregar valores exactos encima de cada barra
-        for i, value in enumerate(cf_bebida.values):
-            total_cf_bebida = total_cf_bebida + value
-            ax.text(
-                i, value + (value * 0.01),       # posición Y: ligeramente arriba de la barra
-                f'{value:,.1f} CF',               # formato: separador de miles, sin decimales
-                ha='center', va='bottom',
-                fontsize=font_size, color='black'
-            )
-
-        # Agregar nota dentro del gráfico (opcional)
-        ax.text(
-            0.98, 0.96,
-            ('AÑO: ' + str(date) + '\n\nTotal: ' + str(f'{total_cf_bebida:,.1f} CF')), # texto a mostrar
-            transform=ax.transAxes,
-            ha='right', va='top',
-            fontsize=font_size-2,
-            color='gray',
-            bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.3')
-        )
-
-        # Cambiar el titulo del eje x
-        ax.set_xlabel("")
-
-        # Rotar etiquetas del eje X
-        plt.xticks(rotation=45, ha='right', fontsize=font_size)
-
-        plt.tight_layout()
-        plt.savefig(f'{concepto}S NO ALCOHOLICAS-{date}.png')
-    except:
-        print(f'Cantidad de datos: {len(df)}')
-        print('No hay datos (Probablemente un domingo o festivo o no hubo rechazos)')
-
-def draw_by_alcoholic_drink_for_year(df, date, bar_width, bar_height, color, font_size):
-    try:        
-        # Filtrar solo las filas con CONCEPTO = 'BEBIDA'
-        concepto = 'BEBIDAS ALCOHOLICAS'
-        df = df[df['CONCEPTO'] == concepto]
-
-        # Agrupar y ordenar
-        cf_bebida = df.groupby('SEDE')['CF'].sum().sort_values(ascending=False)
-
-        # Crear figura y eje
-        fig, ax = plt.subplots()
-
-        # Graficar
-        cf_bebida.plot(
-            kind='bar',
-            title=f'{concepto}',
-            ax=ax,
-            figsize=(bar_width, bar_height),
-            color=color
-        )
-
-        total_cf_bebida = 0
-        # Agregar valores exactos encima de cada barra
-        for i, value in enumerate(cf_bebida.values):
-            total_cf_bebida = total_cf_bebida + value
-            ax.text(
-                i, value + (value * 0.01),       # posición Y: ligeramente arriba de la barra
-                f'{value:,.1f} CF',               # formato: separador de miles, sin decimales
-                ha='center', va='bottom',
-                fontsize=font_size, color='black'
-            )
-
-        # Agregar nota dentro del gráfico (opcional)
-        ax.text(
-            0.98, 0.96,
-            ('AÑO: ' + str(date) + '\n\nTotal: ' + str(f'{total_cf_bebida:,.1f} CF')), # texto a mostrar
-            transform=ax.transAxes,
-            ha='right', va='top',
-            fontsize=font_size-2,
-            color='gray',
-            bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.3')
-        )
-
-        # Cambiar el titulo del eje x
-        ax.set_xlabel("")
-
-        # Rotar etiquetas del eje X
-        plt.xticks(rotation=45, ha='right', fontsize=font_size)
-
-        plt.tight_layout()
-        plt.savefig(f'{concepto}-{date}.png')
-    except:
-        print(f'Cantidad de datos: {len(df)}')
-        print('No hay datos (Probablemente un domingo o festivo o no hubo rechazos)')
 
 # --- Main Settings ---
 if __name__ == "__main__":
@@ -269,8 +53,10 @@ if __name__ == "__main__":
     bar_width = 12
     bar_height = 9
     font_size = 16
-    color_1 = "#FFF59D"
-    color_2 = "#F4A460"
+    color_1 = "#FFED50"
+    color_2 = "#9E9C1A"
+    color_3 = "#FC6060"
+    color_4 = "#992121"
 
     # Leer excel
     df = read_excel_file(local_file_address, file_sheet_name)
@@ -283,8 +69,14 @@ if __name__ == "__main__":
     df_month = filter_by_month(df, month, year)
 
     # Reportes
-    draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+'-'+str(year)), bar_width, bar_height, color_1, font_size)
-    draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+'-'+str(year)), bar_width, bar_height, color_1, font_size)
-
-    draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
-    draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
+    a = nonal.cf_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
+    b = nonal.cf_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_1, font_size)
+    c = nonal.cu_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_4, font_size)
+    d = nonal.cu_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_3, font_size)    
+    ji.join_images_by_concepto([a, b, c, d], "nonalcoholic_report")
+ 
+    e = al.cf_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
+    f = al.cf_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_1, font_size)
+    g = al.cu_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_4, font_size)
+    h = al.cu_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_3, font_size)    
+    ji.join_images_by_concepto([e, f, g, h], "alcoholic_report")
