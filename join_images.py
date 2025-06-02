@@ -1,6 +1,6 @@
 from PIL import Image
 
-def join_images_by_concepto(image_list, concepto):
+def join_images_by_concepto(image_list, concepto, folder_path):
     image_list = [Image.open(img) for img in image_list]
 
     # Obtener ancho y alto total
@@ -17,4 +17,4 @@ def join_images_by_concepto(image_list, concepto):
         x_offset += img.width
 
     # Guardar resultado
-    new_img.save(f'{concepto}.png')
+    new_img.save(f'{folder_path}/imgs/{concepto}.png')
