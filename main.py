@@ -41,8 +41,8 @@ def filter_by_month(df, month, year):
 # --- Main Settings ---
 if __name__ == "__main__":
     # Variables de configuracion
-    year = 2025 # Año de la cuota
-    month = 5 # Mes de la cuota
+    year = int(input("AÑO (2025): "))
+    month = int(input("MES (1-12): "))
     months = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
               7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 
               11: 'Noviembre', 12: 'Diciembre'} # Diccionario de meses
@@ -70,13 +70,13 @@ if __name__ == "__main__":
 
     # Reportes
     a = nonal.cf_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
-    b = nonal.cf_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_1, font_size)
-    c = nonal.cu_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_4, font_size)
+    b = nonal.cu_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_4, font_size)
+    c = nonal.cf_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_1, font_size)    
     d = nonal.cu_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_3, font_size)    
     ji.join_images_by_concepto([a, b, c, d], "nonalcoholic_report")
  
     e = al.cf_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
-    f = al.cf_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_1, font_size)
-    g = al.cu_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_4, font_size)
+    f = al.cu_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_4, font_size)
+    g = al.cf_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_1, font_size)
     h = al.cu_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_3, font_size)    
     ji.join_images_by_concepto([e, f, g, h], "alcoholic_report")
