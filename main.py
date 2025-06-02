@@ -63,10 +63,10 @@ if __name__ == "__main__":
     bar_width = 12
     bar_height = 9
     font_size = 16
-    color_1 = "#1f77b4"
-    color_2 = "#2ca02c"
-    color_3 = "#5fa2dd"
-    color_4 = "#77d977"
+    color_1 = "#4a6fa5"
+    color_2 = "#7f9fc8"
+    color_3 = "#5a8c5a"
+    color_4 = "#95b895"
 
     # Leer excel
     df = read_excel_file(local_file_address, file_sheet_name)
@@ -79,16 +79,16 @@ if __name__ == "__main__":
     df_month = filter_by_month(df, month, year)
 
     # Reportes
-    a = nonal.cf_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_1, font_size)
-    b = nonal.cu_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
-    c = nonal.cf_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_3, font_size)    
-    d = nonal.cu_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_4, font_size)    
+    a = nonal.cu_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_1, font_size)
+    b = nonal.cu_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_2, font_size)
+    c = nonal.cf_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_3, font_size)
+    d = nonal.cf_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_4, font_size)
     ji.join_images_by_concepto([a, b, c, d], f'nonalcoholic_report_{months[month]}_{year}', folder_path)
- 
-    e = al.cf_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_1, font_size)
-    f = al.cu_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_2, font_size)
-    g = al.cf_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_3, font_size)
-    h = al.cu_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_4, font_size)    
+     
+    e = al.cu_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_1, font_size)
+    f = al.cu_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_2, font_size)    
+    g = al.cf_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_3, font_size)
+    h = al.cf_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_4, font_size)    
     ji.join_images_by_concepto([e, f, g, h], f'alcoholic_report_{months[month]}_{year}', folder_path)
 
     # Limpiar carpeta de imagenes
