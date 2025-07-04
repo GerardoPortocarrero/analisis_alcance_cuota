@@ -24,7 +24,7 @@ def analisis_temporal_graphic(df):
     color_inca = "#FFD700"     # Eficiencia - Amarillo Inca Kola
 
     # Aumentar tamaño para evitar que las etiquetas choquen
-    plt.figure(figsize=(14, 7))
+    plt.figure(figsize=(11, 7))
     plt.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
 
     # Eliminar bordes
@@ -37,26 +37,24 @@ def analisis_temporal_graphic(df):
              marker='o', markersize=7, linewidth=2.5, label="CU (Líquido)", color=color_coca)
     for x, y in zip(df_pd["PERIODO"], df_pd["CU_TOTAL"]):
         plt.text(x, y + max(df_pd["CU_TOTAL"]) * 0.03, f"{y:,.0f}", 
-                 color=color_coca, fontsize=9, ha='center')
+                 color=color_coca, fontsize=12, ha='center')
 
     # Graficar CF
     plt.plot(df_pd["PERIODO"], df_pd["CF_TOTAL"], 
              marker='s', markersize=6, linewidth=2.5, label="CF (Cajas)", color=color_fanta)
     for x, y in zip(df_pd["PERIODO"], df_pd["CF_TOTAL"]):
         plt.text(x, y - max(df_pd["CF_TOTAL"]) * 0.05, f"{y:,.0f}", 
-                 color=color_fanta, fontsize=9, ha='center')
+                 color=color_fanta, fontsize=12, ha='center')
 
     # Graficar EFICIENCIA si existe
     if "EFICIENCIA_CU_POR_CF" in df_pd.columns:
         plt.plot(df_pd["PERIODO"], df_pd["EFICIENCIA_CU_POR_CF"], 
                  marker='D', markersize=6, linewidth=2.5, label="Eficiencia (CU/CF)", color=color_inca)
         for x, y in zip(df_pd["PERIODO"], df_pd["EFICIENCIA_CU_POR_CF"]):
-            plt.text(x, y + 0.05, f"{y:.2f}", color=color_inca, fontsize=9, ha='center')
+            plt.text(x, y + 0.05, f"{y:.2f}", color=color_inca, fontsize=12, ha='center')
 
     # Títulos y ejes
     plt.title("Evolución Temporal de CU y CF", fontsize=16, fontweight='bold', color="#333333", pad=20)
-    plt.xlabel("Periodo", fontsize=13)
-    plt.ylabel("Cantidad", fontsize=13)
     plt.xticks(rotation=45, fontsize=10)
     plt.yticks(fontsize=10)
 
@@ -96,7 +94,7 @@ def analisis_estadistico_graphic(df: pl.DataFrame):
     color_fanta = "#FF6F00"    # CF Media
     color_fanta_std = "#FFA04C" # CF STD
 
-    fig, ax = plt.subplots(figsize=(14, 7))
+    fig, ax = plt.subplots(figsize=(11, 7))
 
     # Eliminar bordes del gráfico
     for spine in ax.spines.values():
@@ -120,11 +118,10 @@ def analisis_estadistico_graphic(df: pl.DataFrame):
                         xy=(bar.get_x() + bar.get_width() / 2, height),
                         xytext=(0, 5),  # desplazamiento vertical
                         textcoords="offset points",
-                        ha='center', va='bottom', fontsize=9)
+                        ha='center', va='bottom', fontsize=12)
 
     # Ejes y títulos
     ax.set_title('Media y Desviación Estándar por Mes (CU y CF)', fontsize=16, fontweight='bold', color="#333333", pad=20)
-    ax.set_ylabel('Valor Promedio + STD', fontsize=13)
     ax.set_xticks(x)
     ax.set_xticklabels(periodos, rotation=45, fontsize=10)
     ax.tick_params(axis='y', labelsize=10)
@@ -176,7 +173,7 @@ def analisis_comparativo_graphic(df: pl.DataFrame):
     color_fanta = "#FF6F00"   # CF
     color_text_cf = "#222222" # Texto sobre barra naranja
 
-    fig, ax = plt.subplots(figsize=(14, 7))
+    fig, ax = plt.subplots(figsize=(11, 7))
 
     for spine in ax.spines.values():
         spine.set_visible(False)
@@ -194,7 +191,7 @@ def analisis_comparativo_graphic(df: pl.DataFrame):
         ax.annotate(f'{height:,.0f}', 
                     xy=(bar.get_x() + bar.get_width() / 2, height),
                     xytext=(0, 5), textcoords="offset points",
-                    ha='center', va='bottom', fontsize=9, color=color_coca)
+                    ha='center', va='bottom', fontsize=12, color=color_coca)
 
     # Etiquetas CF con mejor contraste
     for bar in bars_cf:
@@ -202,7 +199,7 @@ def analisis_comparativo_graphic(df: pl.DataFrame):
         ax.annotate(f'{height:,.0f}', 
                     xy=(bar.get_x() + bar.get_width() / 2, height),
                     xytext=(0, -14), textcoords="offset points",
-                    ha='center', va='top', fontsize=9, color=color_text_cf)
+                    ha='center', va='top', fontsize=12, color=color_text_cf)
 
     # Estética general
     ax.set_title("Volumen Total por Sede", fontsize=16, fontweight='bold', color="#333333", pad=20)
@@ -257,7 +254,7 @@ def analisis_tendencia_estacionalidad_graphic(df: pl.DataFrame):
     df_pd["CF_SMOOTH"] = df_pd["CF_TOTAL"].rolling(3, center=True).mean()
 
     # === Gráfico CU ===
-    fig, ax = plt.subplots(figsize=(14, 6))
+    fig, ax = plt.subplots(figsize=(11, 6))
 
     # Bordes fuera
     for spine in ax.spines.values():
@@ -271,10 +268,9 @@ def analisis_tendencia_estacionalidad_graphic(df: pl.DataFrame):
         last_idx = df_pd["CU_SMOOTH"].last_valid_index()
         last_val = df_pd.loc[last_idx, "CU_SMOOTH"]
         ax.annotate(f"{last_val:,.0f}", xy=(last_idx, last_val), xytext=(5, 5),
-                    textcoords="offset points", color=color_coca_smooth, fontsize=9)
+                    textcoords="offset points", color=color_coca_smooth, fontsize=12)
 
     ax.set_title("Tendencia - CU", fontsize=16, fontweight='bold', color="#333333", pad=20)
-    ax.set_ylabel("CU Total", fontsize=13)
     ax.set_xticks(df_pd.index)
     ax.set_xticklabels(df_pd.index, rotation=45, fontsize=10)
     ax.tick_params(axis='y', labelsize=10)
@@ -284,7 +280,7 @@ def analisis_tendencia_estacionalidad_graphic(df: pl.DataFrame):
     plt.show()
 
     # === Gráfico CF ===
-    fig, ax = plt.subplots(figsize=(14, 6))
+    fig, ax = plt.subplots(figsize=(11, 6))
 
     for spine in ax.spines.values():
         spine.set_visible(False)
@@ -297,10 +293,9 @@ def analisis_tendencia_estacionalidad_graphic(df: pl.DataFrame):
         last_idx = df_pd["CF_SMOOTH"].last_valid_index()
         last_val = df_pd.loc[last_idx, "CF_SMOOTH"]
         ax.annotate(f"{last_val:,.0f}", xy=(last_idx, last_val), xytext=(5, 5),
-                    textcoords="offset points", color=color_fanta_smooth, fontsize=9)
+                    textcoords="offset points", color=color_fanta_smooth, fontsize=12)
 
     ax.set_title("Tendencia - CF", fontsize=16, fontweight='bold', color="#333333", pad=20)
-    ax.set_ylabel("CF Total", fontsize=13)
     ax.set_xticks(df_pd.index)
     ax.set_xticklabels(df_pd.index, rotation=45, fontsize=10)
     ax.tick_params(axis='y', labelsize=10)
