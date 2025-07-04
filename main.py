@@ -1,95 +1,197 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[125]:
+
+
 import os
-import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-import non_alcoholic as nonal
-import alcoholic as al
-import join_images as ji
+import matplotlib.dates as mdates
+from datetime import datetime
 from pathlib import Path
+import importlib
+import time
+import polars as pl
+import warnings
+warnings.filterwarnings("ignore")  # Oculta todos los warnings
 
-def read_excel_file(local_file_address, file_sheet_name):
-    # Leer datos del archivo de correo
-    return pd.read_excel(local_file_address, sheet_name=file_sheet_name, header=None)
+# Mis modulos
+import get_data as gd
+import data_analysis as da
 
-def clean_excel_file(df):
-    # Identificar columnas donde la primera fila (índice 0) es NaN
-    columns_to_delete = df.columns[df.iloc[0].isna()]    
 
-    # Eliminar esas columnas
-    df = df.drop(columns=columns_to_delete)
+# In[126]:
 
-    # Tomar la fila 1 como nombres de columnas
-    df.columns = df.iloc[0]
 
-    # Reiniciar el índice si quieres
-    df = df.iloc[1:].reset_index(drop=True)
+# import pyfiglet
+# print(pyfiglet.figlet_format("Analisis Alcance de Cuota"))
 
-    return df
+banner = r"""
+    _                _ _     _          _    _                          
+   / \   _ __   __ _| (_)___(_)___     / \  | | ___ __ _ _ __   ___ ___ 
+  / _ \ | '_ \ / _` | | / __| / __|   / _ \ | |/ __/ _` | '_ \ / __/ _ \
+ / ___ \| | | | (_| | | \__ \ \__ \  / ___ \| | (_| (_| | | | | (_|  __/
+/_/   \_\_| |_|\__,_|_|_|___/_|___/ /_/   \_\_|\___\__,_|_| |_|\___\___|
 
-def filter_by_year(df, year):
-    # Filtrar el DataFrame por el año especificado
-    df['FECHA'] = pd.to_datetime(df['FECHA'], format='%d/%m/%Y')
-    year_inicio = pd.to_datetime('01/01/'+str(year), format='%d/%m/%Y')
-    year_fin = pd.to_datetime('31/12/'+str(year), format='%d/%m/%Y')
-    return df[(df['FECHA'] >= year_inicio) & (df['FECHA'] <= year_fin)]
+     _         ____            _        
+  __| | ___   / ___|   _  ___ | |_ __ _ 
+ / _` |/ _ \ | |  | | | |/ _ \| __/ _` |
+| (_| |  __/ | |__| |_| | (_) | || (_| |
+ \__,_|\___|  \____\__,_|\___/ \__\__,_|
 
-def filter_by_month(df, month, year):
-    # Filtrar el DataFrame por el año especificado
-    fecha_inicio = pd.to_datetime('01/'+str(month)+'/'+str(year), format='%d/%m/%Y')
-    fecha_fin = pd.to_datetime('01/'+str(int(month)+1)+'/'+str(year), format='%d/%m/%Y')
-    return df[(df['FECHA'] >= fecha_inicio) & (df['FECHA'] < fecha_fin)]
+        💥 GENERADOR DE ANALISIS AUTOMATICO DE ALCANCE DE CUOTA 💥
+"""
 
-def clean_folder(folder_path):
-    folder = Path(folder_path)
-    print(list(folder.glob('*.png')))
+print(banner, end='\n\n')
+time.sleep(1)
 
-    # Eliminar archivos .png
-    for img in folder.glob('*.png'):
-        img.unlink()  # .unlink() elimina el archivo
-        print(f'Eliminado: {img}')
 
-# --- Main Settings ---
-if __name__ == "__main__":
-    # Variables de configuracion
-    year = int(input("AÑO (2025): "))
-    month = int(input("MES (1-12): "))
-    months = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
-              7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 
-              11: 'Noviembre', 12: 'Diciembre'} # Diccionario de meses
-    root_address = r'C:\Informacion\Alcance de Cuota' # Direcccion de carpeta raiz
-    folder_path = 'C:/Informacion/Alcance de Cuota/analisis_alcance_cuota'
-    file_name = 'ALCANCE DE CUOTA 2025.xlsx' # Nombre del archivo de Excel
-    file_sheet_name = 'AC TAB' # Nombre de la hoja de Excel
-    local_file_address = os.path.join(root_address, file_name) # Direccion del archivo de Excel
-    bar_width = 12
-    bar_height = 9
-    font_size = 16
-    color_1 = "#4a6fa5"
-    color_2 = "#7f9fc8"
-    color_3 = "#5a8c5a"
-    color_4 = "#95b895"
+# ### Configuracion
 
-    # Leer excel
-    df = read_excel_file(local_file_address, file_sheet_name)
-    df = clean_excel_file(df)
-    
-    # Filtrar por año
-    df_year = filter_by_year(df, year)
+# In[127]:
 
-    # Filtrar por mes
-    df_month = filter_by_month(df, month, year)
 
-    # Reportes
-    a = nonal.cu_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_1, font_size)
-    b = nonal.cu_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_2, font_size)
-    c = nonal.cf_draw_by_non_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_3, font_size)
-    d = nonal.cf_draw_by_non_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_4, font_size)
-    ji.join_images_by_concepto([a, b, c, d], f'nonalcoholic_report_{months[month]}_{year}', folder_path)
-     
-    e = al.cu_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_1, font_size)
-    f = al.cu_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_2, font_size)    
-    g = al.cf_draw_by_alcoholic_drink_for_year(df_year, year, bar_width, bar_height, color_3, font_size)
-    h = al.cf_draw_by_alcoholic_drink_for_actual_month(df_month, str(months[month]+' de '+str(year)), bar_width, bar_height, color_4, font_size)    
-    ji.join_images_by_concepto([e, f, g, h], f'alcoholic_report_{months[month]}_{year}', folder_path)
+# Constantes usadas en el notebook
+TODAY = datetime.today().strftime('%d-%m-%Y')
+MAPI = "MAPI" # Messaging Application Programming Interface
+DOT = "."
+OUTLOOK = "Outlook"
+APPLICATION = "Application"
+ROOT_ADDRESS = r'C:\Informacion\Alcance de Cuota' # Direcccion de carpeta raiz
+PROJECT_ADDRESS = r"C:\Informacion\Alcance de Cuota\analisis_alcance_cuota"
 
-    # Limpiar carpeta de imagenes
-    clean_folder(folder_path)
+MAIL_TO = ''
+MAIL_CC = 'contabilidad@ayacda.com;adm@ayacda.com;gcamana@ayacda.com;rgallegos@aclogistica.pe;gportocarrerob@unsa.edu.pe;'
+
+TEST_MAIL_TO = "ainformacion@ayacda.com;gportocarrerob@unsa.edu.pe;"
+TEST_MAIL_CC = ";"
+
+ALCANCE_CUOTA = {
+    "name": "Alcance de Cuota",
+    "file_name": os.path.join(ROOT_ADDRESS, 'ALCANCE DE CUOTA 2025.xlsx'), # Nombre del archivo de Excel,
+    "sheet_name": 'AC TAB', # Nombre de la hoja de Excel
+    "csv_file_name": os.path.join(PROJECT_ADDRESS, "alcance_cuota.csv"), # Nombre del archivo CSV
+    "relevant_columns": [
+        'FECHA',
+        'AÑO',
+        'MES',
+        'SEDE',
+        'CONCEPTO',
+        'CU',
+        'CF',
+    ],
+}
+
+# Diccionarios
+outlook_folder_codes = {
+    0: 'Calendario',
+    1: 'Contactos',
+    2: 'Borradores',
+    3: 'Diario / Jornal',
+    4: 'Notas',
+    5: 'Tareas',
+    6: 'Bandeja de entrada',
+    7: 'Bandeja de salida',
+    8: 'Elementos enviados',
+    9: 'Elementos eliminados',
+    10: 'Bandeja de correo del servidor',
+    11: 'Conflictos',
+    12: 'Elementos de sincronizacion local',
+    13: 'Elementos de sincronizacion (Envio)',
+    14: 'Elementos de sincronización (Recibo)',
+    15: 'Elementos de sincronización completa',
+    16: 'Diario de formularios',
+    17: 'Carpeta de búsqueda',
+    18: 'Bandeja para reglas cliente',
+    19: 'Carpeta de sugerencias de correo',
+}
+outlook_object_types = {
+    "AppointmentItem": 26,
+    "MailItem": 43,
+    "TaskItem": 46,
+    "ContactItem": 48,
+    "MeetingItem": 53,
+}
+months = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
+    7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 
+    11: 'Noviembre', 12: 'Diciembre'
+}
+
+# Listas
+locaciones = ['PEDREGAL', 'ATICO', 'CHALA', 'CAMANA']
+
+
+# ### Obtencion de datos
+
+# In[128]:
+
+
+importlib.reload(gd)
+
+df = gd.get_clean_data(ALCANCE_CUOTA)
+print(df.schema)
+print(df.shape)
+
+
+# ### Filtro de datos
+
+# In[129]:
+
+
+year = int(input("\n>> Ingresa año (yyyy): "))
+
+print("\nSelecciona locacion/es:")
+print(f"  [1] Todas")
+print(f"  [2] {locaciones[0]}")
+print(f"  [3] {locaciones[1]}")
+print(f"  [4] {locaciones[2]}")
+print(f"  [5] {locaciones[3]}\n")
+
+location_option = int(input(">> Opción (1 - 5): "))
+
+if location_option == 1:
+    filtered_locaciones = locaciones
+else:
+    filtered_locaciones = [locaciones[location_option - 2]]
+
+
+# In[130]:
+
+
+importlib.reload(gd)
+
+df_year = gd.get_specific_year(df, year)
+df_location = gd.get_specific_location(df_year, filtered_locaciones)
+
+df_filtered = df_location
+
+
+# ### Analisis
+
+# In[137]:
+
+
+print(df_filtered)
+
+
+# In[ ]:
+
+
+importlib.reload(da)
+
+# 1. Análisis temporal
+da.analisis_temporal(df_filtered)
+
+# 2. Análisis estadístico
+da.analisis_estadistico(df_filtered)
+
+# 3. Análisis comparativo
+da.analisis_comparativo(df_filtered)
+
+# 4. Tendencias y estacionalidad
+da.analisis_tendencia_estacionalidad(df_filtered)
+
+
+# ### Export it as .py
